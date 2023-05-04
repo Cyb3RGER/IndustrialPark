@@ -142,7 +142,7 @@ namespace IndustrialPark
 
         public void OpenFile(string fileName, bool displayProgressBar, Platform scoobyPlatform)
         {
-            Dispose();
+            Dispose(displayProgressBar);
 
             ProgressBar progressBar = new ProgressBar("Opening " + Path.GetFileName(fileName));
 

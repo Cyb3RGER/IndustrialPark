@@ -114,18 +114,18 @@ namespace IndustrialPark
         public static SharpMesh Plane { get; private set; }
         public static SharpMesh Torus { get; private set; }
 
-        public static List<Vector3> cubeVertices;
-        public static List<Models.Triangle> cubeTriangles;
-        public static List<Vector3> cylinderVertices;
-        public static List<Models.Triangle> cylinderTriangles;
-        public static List<Vector3> pyramidVertices;
-        public static List<Models.Triangle> pyramidTriangles;
-        public static List<Vector3> sphereVertices;
-        public static List<Models.Triangle> sphereTriangles;
-        public static List<Vector3> planeVertices;
-        public static List<Models.Triangle> planeTriangles;
-        public static List<Vector3> torusVertices;
-        public static List<Models.Triangle> torusTriangles;
+        public static List<Vector3> cubeVertices = new List<Vector3>();
+        public static List<Models.Triangle> cubeTriangles = new List<Models.Triangle>();
+        public static List<Vector3> cylinderVertices = new List<Vector3>();
+        public static List<Models.Triangle> cylinderTriangles = new List<Models.Triangle>();
+        public static List<Vector3> pyramidVertices = new List<Vector3>();
+        public static List<Models.Triangle> pyramidTriangles = new List<Models.Triangle>();
+        public static List<Vector3> sphereVertices = new List<Vector3>();
+        public static List<Models.Triangle> sphereTriangles = new List<Models.Triangle>();
+        public static List<Vector3> planeVertices = new List<Vector3>();
+        public static List<Models.Triangle> planeTriangles = new List<Models.Triangle>();
+        public static List<Vector3> torusVertices = new List<Vector3>();
+        public static List<Models.Triangle> torusTriangles = new List<Models.Triangle>();
 
         public void LoadModels(bool tiny = false)
         {
