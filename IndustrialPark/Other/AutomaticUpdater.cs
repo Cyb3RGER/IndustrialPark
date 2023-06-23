@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace IndustrialPark
@@ -183,12 +184,14 @@ namespace IndustrialPark
             return mustUpdate;
         }
 
-        public static void DownloadEditorFiles()
+        public static void DownloadEditorFiles(string baseDir = null)
         {
+            baseDir = baseDir ?? Application.StartupPath;
+            Console.WriteLine(baseDir);
             DownloadAndUnzip(
                 "https://github.com/igorseabra4/IndustrialPark-EditorFiles/archive/master.zip",
-                Application.StartupPath + "/Resources/IndustrialPark-EditorFiles.zip",
-                Application.StartupPath + "/Resources/IndustrialPark-EditorFiles/",
+                baseDir + "/Resources/IndustrialPark-EditorFiles.zip",
+                baseDir + "/Resources/IndustrialPark-EditorFiles/",
                 "IndustrialPark-EditorFiles");
         }
 
@@ -205,7 +208,7 @@ namespace IndustrialPark
         {
             try
             {
-                MessageBox.Show("Will begin download of " + downloadName + " from GitHub to " + destFolder + ". Please wait as this might take a while. Any previously existing files in the folder will be overwritten.");
+                //MessageBox.Show("Will begin download of " + downloadName + " from GitHub to " + destFolder + ". Please wait as this might take a while. Any previously existing files in the folder will be overwritten.");
 
                 using (var webClient = new WebClient())
                     webClient.DownloadFile(new Uri(zipUrl), destZipPath);
@@ -216,11 +219,11 @@ namespace IndustrialPark
 
                 File.Delete(destZipPath);
                 
-                MessageBox.Show("Downloaded " + downloadName + " from " + zipUrl + " to " + destFolder);
+                //MessageBox.Show("Downloaded " + downloadName + " from " + zipUrl + " to " + destFolder);
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                Console.WriteLine(ex.ToString());
             }
         }
     }

@@ -3017,157 +3017,206 @@ namespace IndustrialPark.Randomizer
 
             return true;
         }
+        
+        private bool ShuffleSpatulaGates(bool shuffleSpatulaGates, RandomizerSettings settings,
+            out bool needToAddNumbers)
+        {
+            return ShuffleSpatulaGates(shuffleSpatulaGates, new Dictionary<string, int>
+            {
+                ["Hub1->BB01"] = random.Next(settings.spatReqMin, settings.spatReqMax + 1),
+                ["Hub1->GL01"] = random.Next(settings.spatReqMin, settings.spatReqMax + 1),
+                ["Hub1->Poseidome"] = random.Next(settings.spatReqMin, settings.spatReqMax + 1),
+                ["Hub2->RB01"] = random.Next(settings.spatReqMin, settings.spatReqMax + 1),
+                ["Hub2->SM01"] = random.Next(settings.spatReqMin, settings.spatReqMax + 1),
+                ["Hub2->IP"] = random.Next(settings.spatReqMin, settings.spatReqMax + 1),
+                ["Hub3->KF01"] = random.Next(settings.spatReqMin, settings.spatReqMax + 1),
+                ["Hub3->GY01"] = random.Next(settings.spatReqMin, settings.spatReqMax + 1),
+                ["Chum Bucket->CB Lab"] = settings.spatReqChum != -1
+                    ? settings.spatReqChum
+                    : random.Next(settings.spatReqMin, settings.spatReqMax + 1),
+            }, out needToAddNumbers);
+        }
 
-        private bool ShuffleSpatulaGates(bool shuffleSpatulaGates, RandomizerSettings settings, out bool needToAddNumbers)
+        private bool ShuffleSpatulaGates(bool shuffleSpatulaGates, IDictionary<string, int> values, out bool needToAddNumbers)
         {
             needToAddNumbers = false;
 
             switch (LevelName)
             {
+                //ToDo: add Pineapple->Hub1?
                 case "hb01":
-                    {
-                        if (!shuffleSpatulaGates)
-                            return false;
-                        // Downtown
-                        {
-                            uint spatMechAssetID = new AssetID("SPATULA_BB_MECH_01");
-                            if (ContainsAsset(spatMechAssetID))
-                            {
-                                ((AssetPLAT)GetFromAssetID(spatMechAssetID)).PositionX = 87.315510f;
-                                ((AssetPLAT)GetFromAssetID(spatMechAssetID)).PositionZ = 10.411270f;
-                            }
-
-                            List<uint> platAssetIDs = new List<uint>();
-
-                            uint numRightAssetID = new AssetID("NUMBER_5_BB_MECH_01");
-                            if (ContainsAsset(numRightAssetID))
-                            {
-                                AssetPLAT plat = (AssetPLAT)GetFromAssetID(numRightAssetID);
-                                plat.PositionX = 87.481760f;
-                                plat.PositionZ = 9.643267f;
-
-                                string serializedObject = JsonConvert.SerializeObject(plat.BuildAHDR(platform.Endianness()));
-                                Section_AHDR AHDR = JsonConvert.DeserializeObject<Section_AHDR>(serializedObject);
-
-                                var plat2 = (AssetPLAT)AddAssetWithUniqueID(AHDR, game, platform.Endianness());
-
-                                plat2.PositionX = 87.692600f;
-                                plat2.PositionZ = 8.692189f;
-
-                                platAssetIDs.Add(numRightAssetID);
-                                platAssetIDs.Add(plat2.assetID);
-
-                                plat.Links = new Link[] { new Link(game)
-                                {
-                                    EventReceiveID = (ushort)EventBFBB.Invisible,
-                                    EventSendID = (ushort)EventBFBB.Invisible,
-                                    TargetAsset = plat2.assetID,
-                                    FloatParameter1 = 77,
-                                }
-                                };
-                            }
-
-                            int value = random.Next(settings.spatReqMin, settings.spatReqMax + 1);
-                            SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_BB_COND_01"));
-                            int i = 0;
-                            foreach (uint u in platAssetIDs)
-                                SetNumberPlats(value, i++, u);
-
-                            ReplaceInText(new AssetID("Spatula_exit_bb01_text"), "5", value.ToString());
-                        }
-
-                        // GL
-                        {
-                            int value = random.Next(settings.spatReqMin, settings.spatReqMax + 1);
-                            SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_GL_COND_01"));
-                            SetNumberPlats(value, 0, new AssetID("NUMBER_0_GL_MECH_01"));
-                            SetNumberPlats(value, 1, new AssetID("NUMBER_1_GL_MECH_01"));
-                            ReplaceInText(new AssetID("Spatula_exit_gl01_text"), "10", value.ToString());
-
-                            ((AssetPLAT)GetFromAssetID(new AssetID("NUMBER_0_GL_MECH_01"))).Yaw += 180f;
-                        }
-                        // H2
-                        {
-                            int value = random.Next(settings.spatReqMin, settings.spatReqMax + 1);
-                            SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_H2_COND_01"));
-                            SetNumberPlats(value, 0, new AssetID("NUMBER_5_H2_MECH_01"));
-                            SetNumberPlats(value, 1, new AssetID("NUMBER_1_H2_MECH_01"));
-                            ReplaceInText(new AssetID("Spatula_exit_hub2_text"), "15", value.ToString());
-                        }
-                        // RB
-                        {
-                            int value = random.Next(settings.spatReqMin, settings.spatReqMax + 1);
-                            SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_RB_COND_01"));
-                            SetNumberPlats(value, 0, new AssetID("NUMBER_5_RB_MECH_01"));
-                            SetNumberPlats(value, 1, new AssetID("NUMBER_2_RB_MECH_01"));
-                            ReplaceInText(new AssetID("Spatula_exit_rb01_text"), "25", value.ToString());
-                        }
-                        // SM
-                        {
-                            int value = random.Next(settings.spatReqMin, settings.spatReqMax + 1);
-                            SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_SM_COND_01"));
-                            SetNumberPlats(value, 0, new AssetID("NUMBER_0_SM_MECH_01"));
-                            SetNumberPlats(value, 1, new AssetID("NUMBER_3_SM_MECH_01"));
-                            ReplaceInText(new AssetID("Spatula_exit_sm01_text"), "30", value.ToString());
-
-                            ((AssetPLAT)GetFromAssetID(new AssetID("NUMBER_0_SM_MECH_01"))).Yaw += 180f;
-                        }
-                        // H3
-                        {
-                            int value = random.Next(settings.spatReqMin, settings.spatReqMax + 1);
-                            SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_H3_COND_01"));
-                            SetNumberPlats(value, 0, new AssetID("NUMBER_0_H3_MECH_01"));
-                            SetNumberPlats(value, 1, new AssetID("NUMBER_4_H3_MECH_01"));
-                            ReplaceInText(new AssetID("Spatula_exit_hub3_text"), "40", value.ToString());
-
-                            ((AssetPLAT)GetFromAssetID(new AssetID("NUMBER_0_H3_MECH_01"))).Yaw += 180f;
-                        }
-                        // KF
-                        {
-                            int value = random.Next(settings.spatReqMin, settings.spatReqMax + 1);
-                            SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_KF_COND_01"));
-                            SetNumberPlats(value, 0, new AssetID("NUMBER_0_KF_MECH_01"));
-                            SetNumberPlats(value, 1, new AssetID("NUMBER_5_KF_MECH_01"));
-                            ReplaceInText(new AssetID("Spatula_exit_kf01_text"), "50", value.ToString());
-
-                            ((AssetPLAT)GetFromAssetID(new AssetID("NUMBER_0_KF_MECH_01"))).Yaw += 180f;
-                        }
-                        // GY
-                        {
-                            int value = random.Next(settings.spatReqMin, settings.spatReqMax + 1);
-                            SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_GY_COND_01"));
-                            SetNumberPlats(value, 0, new AssetID("NUMBER_0_GY_MECH_01"));
-                            SetNumberPlats(value, 1, new AssetID("NUMBER_6_GY_MECH_01"));
-                            ReplaceInText(new AssetID("Spatula_exit_gy01_text"), "60", value.ToString());
-                        }
-
-                        needToAddNumbers = true;
-                    }
-                    break;
+                {
+                    return ShuffleSpatulaGatesHB01(shuffleSpatulaGates, values, ref needToAddNumbers);
+                }
+                    
                 case "hb08":
-                    {
-                        if (ContainsAssetWithType(AssetType.Conditional))
-                        {
-                            int value = random.Next(settings.spatReqMin, settings.spatReqMax + 1);
-
-                            if (settings.spatReqChum != -1)
-                                value = settings.spatReqChum;
-
-                            SetCondEvaluationAmount(value - 1, new AssetID("TOLL_DOOR_CONDITIONAL_01"));
-                            SetNumberPlats(value, 0, new AssetID("NUMBER_5_MECH_01"));
-                            SetNumberPlats(value, 1, new AssetID("NUMBER_7_MECH_01"));
-                            ReplaceInText(new AssetID("exit_b301_denial_text"), "75", value.ToString());
-                            ReplaceInText(new AssetID("exit_b301_description_text"), "75", value.ToString());
-
-                            if (value != 75)
-                                needToAddNumbers = true;
-                        }
-                    }
-                    break;
+                {
+                    return ShuffleSpatulaGatesHB08(values["Chum Bucket->CB Lab"], ref needToAddNumbers);
+                }
                 default:
                     return false;
             }
+        }
 
+        public bool ShuffleSpatulaGatesHB08(int value)
+        {
+            var needToAddNumbers = false;
+            ShuffleSpatulaGatesHB08(value, ref needToAddNumbers);
+            return needToAddNumbers;
+        }
+
+        private bool ShuffleSpatulaGatesHB08(int value, ref bool needToAddNumbers)
+        {
+            if (!ContainsAssetWithType(AssetType.Conditional)) return false;
+            SetCondEvaluationAmount(value - 1, new AssetID("TOLL_DOOR_CONDITIONAL_01"));
+            SetNumberPlats(value, 0, new AssetID("NUMBER_5_MECH_01"));
+            SetNumberPlats(value, 1, new AssetID("NUMBER_7_MECH_01"));
+            ReplaceInText(new AssetID("exit_b301_denial_text"), "75", value.ToString());
+            ReplaceInText(new AssetID("exit_b301_description_text"), "75", value.ToString());
+
+            if (value != 75)
+                needToAddNumbers = true;
+            return true;
+        }
+
+        public bool ShuffleSpatulaGatesHB01(int bb, int gl, int b1, int rb, int sm, int b2, int kf, int gy)
+        {
+            var needToAddNumbers = false;
+            ShuffleSpatulaGatesHB01(true, new Dictionary<string, int>
+            {
+                ["Hub1->BB01"] = bb,
+                ["Hub1->GL01"] = gl,
+                ["Hub1->Poseidome"] = b1,
+                ["Hub2->RB01"] = rb,
+                ["Hub2->SM01"] = sm,
+                ["Hub2->IP"] = b2,
+                ["Hub3->KF01"] = kf,
+                ["Hub3->GY01"] = gy
+            }, ref needToAddNumbers);
+            return needToAddNumbers;
+        }
+
+        private bool ShuffleSpatulaGatesHB01(bool shuffleSpatulaGates, IDictionary<string, int> values, ref bool needToAddNumbers)
+        {
+            if (!shuffleSpatulaGates)
+                return false;
+            // ToDo: add JF?
+            // Downtown
+            {
+                uint spatMechAssetID = new AssetID("SPATULA_BB_MECH_01");
+                if (ContainsAsset(spatMechAssetID))
+                {
+                    ((AssetPLAT)GetFromAssetID(spatMechAssetID)).PositionX = 87.315510f;
+                    ((AssetPLAT)GetFromAssetID(spatMechAssetID)).PositionZ = 10.411270f;
+                }
+
+                List<uint> platAssetIDs = new List<uint>();
+
+                uint numRightAssetID = new AssetID("NUMBER_5_BB_MECH_01");
+                if (ContainsAsset(numRightAssetID))
+                {
+                    AssetPLAT plat = (AssetPLAT)GetFromAssetID(numRightAssetID);
+                    plat.PositionX = 87.481760f;
+                    plat.PositionZ = 9.643267f;
+
+                    string serializedObject = JsonConvert.SerializeObject(plat.BuildAHDR(platform.Endianness()));
+                    Section_AHDR AHDR = JsonConvert.DeserializeObject<Section_AHDR>(serializedObject);
+
+                    var plat2 = (AssetPLAT)AddAssetWithUniqueID(AHDR, game, platform.Endianness());
+
+                    plat2.PositionX = 87.692600f;
+                    plat2.PositionZ = 8.692189f;
+
+                    platAssetIDs.Add(numRightAssetID);
+                    platAssetIDs.Add(plat2.assetID);
+
+                    plat.Links = new Link[]
+                    {
+                        new Link(game)
+                        {
+                            EventReceiveID = (ushort)EventBFBB.Invisible,
+                            EventSendID = (ushort)EventBFBB.Invisible,
+                            TargetAsset = plat2.assetID,
+                            FloatParameter1 = 77,
+                        }
+                    };
+                }
+
+                int value = values["Hub1->BB01"];
+                SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_BB_COND_01"));
+                int i = 0;
+                foreach (uint u in platAssetIDs)
+                    SetNumberPlats(value, i++, u);
+
+                ReplaceInText(new AssetID("Spatula_exit_bb01_text"), "5", value.ToString());
+            }
+
+            // GL
+            {
+                int value = values["Hub1->GL01"];
+                SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_GL_COND_01"));
+                SetNumberPlats(value, 0, new AssetID("NUMBER_0_GL_MECH_01"));
+                SetNumberPlats(value, 1, new AssetID("NUMBER_1_GL_MECH_01"));
+                ReplaceInText(new AssetID("Spatula_exit_gl01_text"), "10", value.ToString());
+
+                ((AssetPLAT)GetFromAssetID(new AssetID("NUMBER_0_GL_MECH_01"))).Yaw += 180f;
+            }
+            // H2
+            {
+                int value = values["Hub1->Poseidome"];
+                SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_H2_COND_01"));
+                SetNumberPlats(value, 0, new AssetID("NUMBER_5_H2_MECH_01"));
+                SetNumberPlats(value, 1, new AssetID("NUMBER_1_H2_MECH_01"));
+                ReplaceInText(new AssetID("Spatula_exit_hub2_text"), "15", value.ToString());
+            }
+            // RB
+            {
+                int value = values["Hub2->RB01"];
+                SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_RB_COND_01"));
+                SetNumberPlats(value, 0, new AssetID("NUMBER_5_RB_MECH_01"));
+                SetNumberPlats(value, 1, new AssetID("NUMBER_2_RB_MECH_01"));
+                ReplaceInText(new AssetID("Spatula_exit_rb01_text"), "25", value.ToString());
+            }
+            // SM
+            {
+                int value = values["Hub2->SM01"];
+                SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_SM_COND_01"));
+                SetNumberPlats(value, 0, new AssetID("NUMBER_0_SM_MECH_01"));
+                SetNumberPlats(value, 1, new AssetID("NUMBER_3_SM_MECH_01"));
+                ReplaceInText(new AssetID("Spatula_exit_sm01_text"), "30", value.ToString());
+
+                ((AssetPLAT)GetFromAssetID(new AssetID("NUMBER_0_SM_MECH_01"))).Yaw += 180f;
+            }
+            // H3
+            {
+                int value = values["Hub2->IP"];
+                SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_H3_COND_01"));
+                SetNumberPlats(value, 0, new AssetID("NUMBER_0_H3_MECH_01"));
+                SetNumberPlats(value, 1, new AssetID("NUMBER_4_H3_MECH_01"));
+                ReplaceInText(new AssetID("Spatula_exit_hub3_text"), "40", value.ToString());
+
+                ((AssetPLAT)GetFromAssetID(new AssetID("NUMBER_0_H3_MECH_01"))).Yaw += 180f;
+            }
+            // KF
+            {
+                int value = values["Hub3->KF01"];
+                SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_KF_COND_01"));
+                SetNumberPlats(value, 0, new AssetID("NUMBER_0_KF_MECH_01"));
+                SetNumberPlats(value, 1, new AssetID("NUMBER_5_KF_MECH_01"));
+                ReplaceInText(new AssetID("Spatula_exit_kf01_text"), "50", value.ToString());
+
+                ((AssetPLAT)GetFromAssetID(new AssetID("NUMBER_0_KF_MECH_01"))).Yaw += 180f;
+            }
+            // GY
+            {
+                int value = values["Hub3->GY01"];
+                SetCondEvaluationAmount(value - 1, new AssetID("TOLL_BOOTH_GY_COND_01"));
+                SetNumberPlats(value, 0, new AssetID("NUMBER_0_GY_MECH_01"));
+                SetNumberPlats(value, 1, new AssetID("NUMBER_6_GY_MECH_01"));
+                ReplaceInText(new AssetID("Spatula_exit_gy01_text"), "60", value.ToString());
+            }
+
+            needToAddNumbers = true;
             return true;
         }
 
