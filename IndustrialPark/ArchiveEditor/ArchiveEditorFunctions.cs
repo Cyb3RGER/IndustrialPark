@@ -144,10 +144,13 @@ namespace IndustrialPark
         {
             Dispose(displayProgressBar);
 
-            ProgressBar progressBar = new ProgressBar("Opening " + Path.GetFileName(fileName));
+            ProgressBar progressBar = null;
 
             if (displayProgressBar)
+            {
+                progressBar = new ProgressBar("Opening " + Path.GetFileName(fileName));
                 progressBar.Show();
+            }
 
             assetDictionary = new Dictionary<uint, Asset>();
 
@@ -164,11 +167,11 @@ namespace IndustrialPark
             }
             catch (Exception e)
             {
-                progressBar.Close();
+                progressBar?.Close();
                 throw e;
             }
 
-            progressBar.SetProgressBar(0, hipFile.DICT.ATOC.AHDRList.Count, 1);
+            progressBar?.SetProgressBar(0, hipFile.DICT.ATOC.AHDRList.Count, 1);
 
             this.game = game;
             platform = (scoobyPlatform != Platform.Unknown) ? scoobyPlatform : platformFromFile;
@@ -201,7 +204,7 @@ namespace IndustrialPark
 
                     autoComplete.Add(AHDR.ADBG.assetName);
 
-                    progressBar.PerformStep();
+                    progressBar?.PerformStep();
 #if DEBUG
                     tempAhdrUglyDict[AHDR.assetID] = AHDR;
 #endif
@@ -226,7 +229,7 @@ namespace IndustrialPark
             if (NoLayers)
                 Layers = new List<Layer>();
 
-            progressBar.Close();
+            progressBar?.Close();
 #if DEBUG
             LogAssetOrder(hipFile.DICT, tempAhdrUglyDict);
 #endif
